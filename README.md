@@ -14,7 +14,7 @@ In the project directory, you can run:
 Launches ***api server*** to get Item data.<br>
 You can see your api in http://localhost:7070/items
 
-This command needs to run on saparate node js terminal.
+This command needs to run on separate node js terminal.
 
 ### `npm start`
 
@@ -24,6 +24,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 The page will reload if you make edits.<br>
 You will also see any lint errors in the console.
 
-This command needs to run on saparate node js terminal.
+This command needs to run on separate node js terminal.
 #
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
