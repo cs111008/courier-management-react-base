@@ -1,14 +1,14 @@
 import React from "react";
 
 const Table = props => {
-  const { items } = props;
+  const { items, orderPlaced } = props;
   const renderItemRow = () => {
     return (
       <React.Fragment>
         {items.map(item => (
           <tr key={item.id}>
             <td>
-              <input type="checkbox" onChange={(event) => props.handleItemSelect(event, item)} />
+              <input type="checkbox" checked={item.selected} disabled={orderPlaced} onChange={(event) => props.handleItemSelect(event, item)} />
             </td>
             <td> {item.itemName} </td>
             <td> {item.price} </td>
@@ -19,7 +19,7 @@ const Table = props => {
     );
   };
   return (
-    <table className="table table-striped">
+    <table className="table table-striped table-sm mt-5">
       <thead>
         <tr>
           <th />
@@ -28,7 +28,7 @@ const Table = props => {
           <th> Weight(g) </th>
         </tr>
       </thead>
-      <tbody>{items.length && renderItemRow(items)}</tbody>
+      <tbody>{items.length ? renderItemRow(items) : null}</tbody>
     </table>
   );
 };

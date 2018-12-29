@@ -3,7 +3,6 @@ import React from "react";
 const Pagination = props => {
   const {
     itemLength,
-    itemsPerPage,
     currentPage,
     handleTablePaginationClick
   } = props;
@@ -11,16 +10,16 @@ const Pagination = props => {
   return (
     <ul className="pagination justify-content-end">
       {[...Array(itemLength).keys()].map((number, index) => {
-          let displaNumber = index +1;
+          let displayNumber = index +1;
         return (
           <li
-            key={displaNumber}
-            id={displaNumber}
+            key={displayNumber}
+            id={displayNumber}
             onClick={handleTablePaginationClick}
-            className={`page-item ${displaNumber === currentPage && "active" }`}
+            className={`page-item ${displayNumber === currentPage && "active" }`}
           >
-            <span id={displaNumber} className="page-link">
-              {displaNumber}
+            <span id={displayNumber} className="page-link">
+              {displayNumber}
             </span>
           </li>
         );

@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import { API_END_POINT } from "../../config/api";
 import Table from "../../components/table";
 import Pagination from "../../components/pagination";
+import OrderDescription from "../../components/order-description";
+import Button from "../../components/button";
 
 class Home extends Component {
   constructor(props) {
@@ -9,123 +11,89 @@ class Home extends Component {
     this.state = {
       items: [],
       cartItems: [],
-      order: [],
       orderPlaced: false,
       currentPage: 1,
       itemsPerPage: 10
     };
-    this.handleItemSelect = this.handleItemSelect.bind(this);
-    this.handleTablePaginationClick = this.handleTablePaginationClick.bind(
-      this
-    );
-    this.placeOrder = this.placeOrder.bind(this);
   }
   componentDidMount() {
     window
       .fetch(API_END_POINT + "/items")
       .then(response => response.json())
-      .then(items => this.setState({ items: items }));
+      .then(items => {
+        const updatedItems = items.map(item => {
+          item.selected = false;
+          return item;
+        });
+        this.setState({ items: updatedItems })
+      });
   }
-  handleItemSelect(event, item) {
-    const { cartItems } = this.state;
-    const existingItem = cartItems.find(_item => _item.id === item.id);
-    if (!existingItem) {
-      cartItems.push(item);
-      this.setState({ cartItems: cartItems });
-    } else {
-      const _cartItems = cartItems.filter(_item => _item.id !== item.id);
-      this.setState({ cartItems: _cartItems });
-    }
+
+  handleItemSelect = (event, item) => {
+    const { items } = this.state;
+
+    const _cartItems = items.map(_item => {
+      if (_item.id === item.id) {
+        _item.selected = !_item.selected;
+        return _item
+      }
+      return _item
+    });
+    this.setState({ cartItems: _cartItems.filter(cartItem => cartItem.selected), items: _cartItems });
   }
-  handleTablePaginationClick(event) {
+
+  handleTablePaginationClick = (event) => {
     this.setState({
       currentPage: Number(event.target.id)
     });
   }
-  placeOrder() {
+
+  handlePlaceOrder = () => {
     const { cartItems } = this.state;
-    let totalPrice = 0;
-    let totalWeigth = 0;
-    let order = {};
-    cartItems.map((orderItem, index) => {
-      totalPrice += Number.parseInt(orderItem.price);
-      totalWeigth += Number.parseInt(orderItem.weight);
-    });
-    const charges = [
-      {
-        min: 0,
-        max: 200,
-        charge: 5
-      },
-      {
-        min: 200,
-        max: 500,
-        charge: 10
-      },
-      {
-        min: 500,
-        max: 1000,
-        charge: 15
-      },
-      {
-        min: 1000,
-        max: 5000,
-        charge: 5
-      }
-    ];
-    if (totalPrice > 250) {
-    } else {
-      let zzz = 0;
-      charges.map(charge => {
-        if(totalWeigth >= charge.min && totalWeigth < charge.max)
-          zzz = charge.charge
-      })
-      order.items = cartItems.reduce(
-        (total, item) => total + item.itemName + " ",
-        ""
-      );
-      order.weight = totalWeigth;
-      order.totalPrice = totalPrice;
-      order.courierCharges = zzz;
-      console.log('order====>', order);
-      
-    }
+    if (cartItems.length) this.setState({ orderPlaced: true });
   }
+
+  handleNewOrder = () => {
+    //Reset items selection
+    const { items } = this.state;
+    this.setState({ orderPlaced: false, items: items.map(item => { item.selected = false; return item; }) })
+  }
+
   render() {
-    const { items, itemsPerPage, currentPage } = this.state;
-    console.log("this.state====>", this.state.cartItems);
-    const startIndex =
-      currentPage === 1 ? currentPage - 1 : (currentPage - 1) * itemsPerPage;
-    const lastIndex =
-      currentPage === 1 ? itemsPerPage : itemsPerPage * currentPage;
+    const { items, itemsPerPage, currentPage, orderPlaced, cartItems } = this.state;
+
+    // Index Calculation for Pagination
+    const startIndex = currentPage === 1 ? currentPage - 1 : (currentPage - 1) * itemsPerPage;
+    const secondIndex = currentPage === 1 ? itemsPerPage : itemsPerPage * currentPage;
 
     return (
-      <div className="container">
-        <nav className="navbar navbar-expand-lg navbar-light bg-primary">
+      <div className="container-fluid">
+        <nav className="navbar navbar-expand-lg sticky-top bg-primary justify-content-between">
           <a className="navbar-brand text-white" href="/">
             Courier Management
           </a>
+          <form className="form-inline">
+            <Button orderPlaced={orderPlaced} placeOrder={this.handlePlaceOrder} newOrder={this.handleNewOrder} />
+          </form>
         </nav>
-        <div className="row" />
-        <div className="row">
-          <div className="col-12">
-            <button
-              className="btn btn-lg btn-primary justify-content-end custom-btn"
-              onClick={this.placeOrder}
-            >
-              Place Order
-            </button>
+        <div className="row" >
+          <div className="col-sm-12 order-container">
+            <div className="row mt-3">
+              {orderPlaced && cartItems.length ? (
+                <OrderDescription cartItems={cartItems} />
+              ) : null}
+            </div>
           </div>
         </div>
         <div className="row">
           <div className="col-12">
-            <Table items={items} handleItemSelect={this.handleItemSelect} />
-            {/*<Pagination
+            <Table items={items.slice(startIndex, secondIndex)} orderPlaced={orderPlaced} handleItemSelect={this.handleItemSelect} />
+            <Pagination
               itemLength={Math.ceil(items.length / itemsPerPage)}
               itemsPerPage={itemsPerPage}
               currentPage={currentPage}
               handleTablePaginationClick={this.handleTablePaginationClick}
-            />*/}
+            />
           </div>
         </div>
       </div>
