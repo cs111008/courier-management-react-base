@@ -2,7 +2,7 @@
 
 Basic app to understand componenet structure and programming logics of React JS application.
 
-### You will need Globaly installed Create React App to run this project
+### You will need Globally installed Create React App to run this project
 `npm i create-react-app -g`
 
 ## Available Scripts
